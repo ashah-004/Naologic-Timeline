@@ -4,6 +4,22 @@
     <h1>Work Orders</h1>
     <div class="timescale-wrapper">
 
+      @if (isMobile) {
+      <div class="mobile-wc-control">
+        <span class="label">Work Center</span>
+        <ng-select 
+          [items]="timelineService.workCenters()" 
+          bindLabel="data.name" 
+          bindValue="docId"
+          [(ngModel)]="selectedMobileWorkCenterId"
+          [clearable]="false" 
+          [searchable]="false"
+          appendTo=".timescale-wrapper"
+          class="timescale-dropdown">
+        </ng-select>
+      </div>
+      }
+
       <div class="timescale-control">
         <span class="label">Timescale</span>
 
@@ -16,12 +32,14 @@
   </div>
 
   <div class="timeline-card">
+    @if (!isMobile) {
     <div class="sidebar">
       <div class="grid-header-cell">Work Center</div>
       @for (wc of timelineService.workCenters(); track wc.docId) {
       <div class="grid-row-cell">{{ wc.data.name }}</div>
       }
     </div>
+    }
 
     <div class="timeline-scroll-area" #scrollArea>
       <div class="date-headers-row">
@@ -39,7 +57,7 @@
 
       <div class="grid-body">
 
-        @for (wc of timelineService.workCenters(); track wc.docId; let isFirst = $first) {
+        @for (wc of visibleWorkCenters; track wc.docId; let isFirst = $first) {
         <div class="timeline-row" [class.is-first-row]="isFirst">
 
           <div class="cells-container">

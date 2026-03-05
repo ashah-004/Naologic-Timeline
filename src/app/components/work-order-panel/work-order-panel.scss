@@ -121,3 +121,29 @@ button.btn-primary:focus, button.btn-primary:active, button.btn-primary:focus-vi
 .panel-backdrop.closing {
   animation: fadeOut 0.3s ease-in-out forwards !important;
 }
+
+@media (max-width: 576px) {
+  .side-panel {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  .panel-header {
+    gap: 12px !important; 
+    padding: 16px !important; 
+    flex-direction: column; 
+  }
+
+  .panel-header .header-actions {
+    width: 100%;
+    justify-content: flex-start; 
+    margin-top: 4px;
+  }
+
+  .panel-header h2 { font-size: 18px !important; }
+  .panel-header .subtitle { font-size: 14px !important; }
+  
+  .panel-content {
+    padding: 16px !important;
+  }
+}

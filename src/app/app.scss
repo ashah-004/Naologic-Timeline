@@ -7,9 +7,13 @@
 .timescale-wrapper {
   position: relative;
   width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.timescale-control { 
+.mobile-wc-control, .timescale-control { 
   display: flex; 
   align-items: center; 
   border: none; 
@@ -21,7 +25,7 @@
   overflow: hidden; 
 }
 
-.timescale-control .label { 
+.mobile-wc-control .label, .timescale-control .label { 
   font-size: 14px; 
   font-weight: 400;
   color: rgba(104, 113, 150, 1); 
@@ -120,7 +124,8 @@
   max-height: 70vh !important; 
   overflow: auto !important;
   display: flex; 
-  flex: 1; 
+  flex: none;
+  height: fit-content; 
   border: 1px solid #E5E7EB; 
   border-radius: 8px; 
   background: #fff; 
@@ -193,8 +198,10 @@
   height: 48px; 
   box-sizing: border-box; 
   position: relative; 
-  display: flex; 
-  align-items: center; 
+
+  width: max-content; 
+  min-width: 100%;
+  
   background-color: rgba(247, 249, 252, 1) !important; 
 
   z-index: 1;
@@ -212,8 +219,9 @@
 
 .cells-container {
   display: flex;
-  position: absolute; 
-  top: 0; left: 0; bottom: 0; right: 0;
+  width: max-content;
+  min-width: 100%;
+  height: 100%;
   z-index: 0;
 }
 
@@ -299,3 +307,21 @@
   }
 }
 
+@media (max-width: 992px) {
+  .app-layout {
+    padding: 20px 20px 0px 20px;
+  }
+
+  .timeline-card {
+    display: block !important; 
+    flex: none !important; 
+    height: fit-content !important; 
+    max-height: none !important;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

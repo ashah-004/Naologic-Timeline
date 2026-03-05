@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -13,7 +13,7 @@ import { WorkOrderPanelComponent } from './components/work-order-panel/work-orde
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
+export class App implements OnInit{
   timelineService = inject(TimelineService);
   scales: Timescale[] = ['Day', 'Week', 'Month'];
 
@@ -23,6 +23,31 @@ export class App {
   selectedOrder: WorkOrder | null = null;
   clickedCenterId = '';
   clickedDateStr = ''; 
+
+  isMobile = window.innerWidth <= 992; 
+  selectedMobileWorkCenterId: string | null = null;
+
+  @HostListener('window:resize')
+  onResize() {
+    this.isMobile = window.innerWidth <= 992;
+  }
+
+  ngOnInit() {
+    const centers = this.timelineService.workCenters();
+    if (centers.length > 0) {
+      this.selectedMobileWorkCenterId = centers[0].docId;
+    }
+  }
+
+  get visibleWorkCenters() {
+    const centers = this.timelineService.workCenters();
+    
+    if (this.isMobile) {
+      return centers.filter(wc => wc.docId === this.selectedMobileWorkCenterId);
+    }
+    
+    return centers; 
+  }
 
   ngAfterViewInit() {
     setTimeout(() => this.scrollToToday(), 50); 
@@ -121,4 +146,6 @@ export class App {
       return 1 * this.timelineService.pixelsPerDay();
     }
   }
+
+  
 }
