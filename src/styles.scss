@@ -1,0 +1,35 @@
+
+body {
+  font-family: "Circular-Std", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.ng-select.custom-select {
+  .ng-select-container {
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    height: 40px;
+    box-shadow: none;
+    font-family: "Circular-Std", sans-serif;
+  }
+  &.ng-select-opened > .ng-select-container {
+    border-color: #4F46E5; 
+  }
+}
+
+.timescale-dropdown {
+  width: 120px;
+  .ng-select-container {
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+    height: 32px;
+    min-height: 32px;
+  }
+}
+
+input[ngbDatepicker] {
+  cursor: pointer;
+}

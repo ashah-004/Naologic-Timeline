@@ -1,0 +1,119 @@
+.bar-container { 
+  position: absolute; 
+  top: 5px; 
+  height: 38px; 
+  z-index: 5; 
+  padding-right: 2px; 
+  box-sizing: border-box;
+}
+
+.order-bar {
+  width: 100%; 
+  height: 100%; 
+  border-radius: 8px; 
+  display: flex; 
+  align-items: center; 
+  padding: 0 12px;
+  box-sizing: border-box; 
+  cursor: pointer; 
+
+  &:hover, &:focus-within {
+    z-index: 9999 !important;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    
+    .three-dots-select { display: block; }
+  }
+
+  .title { 
+    font-size: 14px; 
+    font-weight: 400; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    margin-right: 8px; 
+    flex: 1; 
+    color: rgba(3, 9, 41, 1);
+  }
+  
+  .status-pill { 
+    font-size: 14px; 
+    padding: 2px 8px; 
+    border-radius: 5px; 
+    font-weight: 400; 
+  }
+
+  &.complete { background: rgba(248, 255, 243, 1); box-shadow: 0 0 0 1px rgba(209, 250, 179, 1);  .status-pill { background: rgba(225, 255, 204, 1); color: rgba(8, 162, 104, 1); } }
+  &.in-progress { background: rgba(237, 238, 255, 1); box-shadow: 0 0 0 1px rgba(222, 224, 255, 1);  .status-pill { background: rgba(214, 216, 255, 1); color: rgba(62, 64, 219, 1); } }
+  &.open { background: rgba(242, 254, 255, 1); box-shadow: 0 0 0 1px rgba(206, 251, 255, 1); .status-pill { background: rgba(228, 253, 255, 1);  color: rgba(0, 176, 191, 1); } }
+  &.blocked { background: rgba(255, 252, 241, 1); box-shadow: 0 0 0 1px rgba(255, 245, 207, 1);  .status-pill { background: rgba(252, 238, 181, 1); color: rgba(177, 54, 0, 1); } }
+
+
+  .three-dots-select {
+    display: none; 
+    margin-left: 4px; 
+    width: 32px; 
+    
+    ::ng-deep .ng-select-container {
+      background: rgba(241, 243, 248, 1) !important; 
+      border-radius: 5px !important; 
+      border: none !important;
+      min-height: unset !important;
+      height: 26px !important; 
+      box-shadow: none !important;
+      cursor: pointer !important;
+
+      .ng-value-container {
+        padding: 0 !important;
+        justify-content: center; 
+        
+        .ng-placeholder {
+          position: static !important;
+          transform: none !important;
+          letter-spacing: 1px; 
+          color: #6B7280 !important; 
+          font-size: 12px; 
+          font-weight: bold; 
+          line-height: 1;
+        }
+      }
+
+      .ng-arrow-wrapper { display: none !important; }
+    }
+  }
+}
+
+
+::ng-deep .ng-dropdown-panel.three-dots-select{
+  border: none !important; 
+  border-radius: 5px !important; 
+  box-shadow: 0 0 0 1px rgba(104, 113, 150, 0.1) , 0 2.5px 3px -1.5px rgba(200, 207, 233, 1) , 0 4.5px 5px -1px rgba(216, 220, 235, 1) !important; 
+  padding: 8px !important; 
+  
+  width: 200px !important; 
+  min-width: unset !important; 
+  
+  background: #ffffff !important;
+  margin-top: 4px !important;
+
+  .ng-dropdown-panel-items .ng-option {
+    padding: 0px !important; 
+    background-color: #ffffff !important; 
+    
+    &:hover, &.ng-option-marked, &.ng-option-selected {
+      background-color: #ffffff !important; 
+    }
+
+    .custom-dropdown-item {
+      padding: 6px 8px !important;
+      font-size: 14px !important; 
+      font-weight: 400 !important;
+      color: rgba(47, 48, 89, 1) !important;
+      cursor: pointer; 
+      transition: color 0.1s ease-in-out !important; 
+
+      &.text-danger-item {
+        color: rgba(62, 64, 219, 1) !important; 
+      }
+    }
+  }
+}
