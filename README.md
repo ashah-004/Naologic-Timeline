@@ -1,4 +1,4 @@
-# 🗓️ Angular Gantt Timeline & Work Order Management
+# 🗓️ Angular Timeline & Work Order Management
 
 A Timeline and Work Order management UI built entirely in Angular, featuring dynamic timescale Zoom levels.
 
