@@ -3,15 +3,32 @@ import { Injectable, signal, computed, effect } from '@angular/core';
 export type WorkOrderStatus = 'open' | 'in-progress' | 'complete' | 'blocked';
 export type Timescale = 'Day' | 'Week' | 'Month';
 
-export interface WorkCenter { docId: string; docType: 'workCenter'; data: { name: string; }; }
-export interface WorkOrder { docId: string; docType: 'workOrder'; data: { name: string; workCenterId: string; status: WorkOrderStatus; startDate: string; endDate: string; }; }
+export interface WorkCenter { 
+  docId: string; 
+  docType: 'workCenter'; 
+  data: { name: string; }; 
+}
+
+export interface WorkOrder { 
+  docId: string; 
+  docType: 'workOrder'; 
+  data: { 
+    name: string; 
+    workCenterId: string; 
+    status: WorkOrderStatus; 
+    startDate: string; 
+    endDate: string; 
+  }; 
+}
 
 @Injectable({ providedIn: 'root' })
 export class TimelineService {
   timeScale = signal<Timescale>('Month');
-
-  timelineStartDate = new Date(new Date().getFullYear() - 2, 0, 1);;
   pixelsPerDay = signal<number>(6);
+
+  private today = new Date();
+  timelineStartDate = signal<Date>(new Date(this.today.getFullYear() - 2, this.today.getMonth(), 1));
+  timelineEndDate = signal<Date>(new Date(this.today.getFullYear() + 2, this.today.getMonth(), 1));
 
   workCenters = signal<WorkCenter[]>([
     { docId: 'wc_1', docType: 'workCenter', data: { name: 'Genesis Hardware' } },
@@ -23,9 +40,9 @@ export class TimelineService {
     { docId: 'wc_7', docType: 'workCenter', data: { name: "Google" } },
     { docId: 'wc_8', docType: 'workCenter', data: { name: "Amazon" } },
     { docId: 'wc_9', docType: 'workCenter', data: { name: "Apple" } },
-    { docId: 'wc_9', docType: 'workCenter', data: { name: "Nvidia" } },
-    { docId: 'wc_9', docType: 'workCenter', data: { name: "AMD" } },
-    { docId: 'wc_10', docType: 'workCenter', data: { name: "Netflix" } }
+    { docId: 'wc_10', docType: 'workCenter', data: { name: "Nvidia" } },
+    { docId: 'wc_11', docType: 'workCenter', data: { name: "AMD" } },
+    { docId: 'wc_12', docType: 'workCenter', data: { name: "Netflix" } }
   ]);
 
   workOrders = signal<WorkOrder[]>([
@@ -46,23 +63,25 @@ export class TimelineService {
     });
   }
 
+  
   timelineColumns = computed(() => {
     const scale = this.timeScale();
     const cols = [];
-    let current = new Date(this.timelineStartDate);
+    
+    let current = new Date(this.timelineStartDate());
+    const end = new Date(this.timelineEndDate());
 
-    const iterations = scale === 'Month' ? 60 : scale === 'Week' ? 260 : 1825;
+    let iterations = 0;
+    const maxIterations = 5000; 
 
-    for (let i = 0; i < iterations; i++) {
+    while (current < end && iterations < maxIterations) {
       let label = '';
       let daysInCol = 1;
       const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
 
       if (scale === 'Month') {
         label = current.toLocaleString('default', { month: 'short', year: 'numeric' });
-
         daysInCol = new Date(current.getFullYear(), current.getMonth() + 1, 0).getDate();
-
         current.setMonth(current.getMonth() + 1);
       } else if (scale === 'Week') {
         label = `Week of ${current.toLocaleString('default', { month: 'short', day: 'numeric', year: 'numeric' })}`;
@@ -75,9 +94,26 @@ export class TimelineService {
       }
 
       cols.push({ label, dateStr, daysInCol });
+      iterations++;
     }
     return cols;
   });
+
+  extendTimeline(direction: 'past' | 'future', monthsToAdd: number = 6) {
+    if (direction === 'past') {
+      this.timelineStartDate.update(oldDate => {
+        const newDate = new Date(oldDate);
+        newDate.setMonth(newDate.getMonth() - monthsToAdd);
+        return newDate;
+      });
+    } else {
+      this.timelineEndDate.update(oldDate => {
+        const newDate = new Date(oldDate);
+        newDate.setMonth(newDate.getMonth() + monthsToAdd);
+        return newDate;
+      });
+    }
+  }
 
   setTimescale(scale: Timescale) {
     this.timeScale.set(scale);
@@ -102,14 +138,18 @@ export class TimelineService {
   }
 
   saveWorkOrder(order: WorkOrder, mode: 'create' | 'edit') {
-    if (mode === 'create') this.workOrders.update(orders => [...orders, order]);
-    else this.workOrders.update(orders => orders.map(o => o.docId === order.docId ? order : o));
+    if (mode === 'create') {
+      this.workOrders.update(orders => [...orders, order]);
+    } else {
+      this.workOrders.update(orders => orders.map(o => o.docId === order.docId ? order : o));
+    }
   }
 
   deleteWorkOrder(docId: string) {
     this.workOrders.update(orders => orders.filter(o => o.docId !== docId));
   }
 
+  
   getDaysBetween(startDate: string | Date, endDate: string | Date): number {
     const getUTC = (input: string | Date) => {
       if (typeof input === 'string') {

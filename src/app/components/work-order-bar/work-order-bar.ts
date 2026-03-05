@@ -26,7 +26,7 @@ export class WorkOrderBarComponent {
   
 
 get computedLeft(): number {
-  const daysFromStart = this.timelineService.getDaysBetween(this.timelineService.timelineStartDate, this.order.data.startDate);
+  const daysFromStart = this.timelineService.getDaysBetween(this.timelineService.timelineStartDate(), this.order.data.startDate);
   return daysFromStart * this.timelineService.pixelsPerDay();
 }
 

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ChangeDetectorRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -13,11 +13,14 @@ import { WorkOrderPanelComponent } from './components/work-order-panel/work-orde
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App implements OnInit{
-  timelineService = inject(TimelineService);
-  scales: Timescale[] = ['Day', 'Week', 'Month'];
 
+export class App implements OnInit, AfterViewInit {
+  timelineService = inject(TimelineService);
+  cdr = inject(ChangeDetectorRef);
   
+  @ViewChild('scrollArea') scrollArea!: ElementRef<HTMLDivElement>;
+
+  scales: Timescale[] = ['Day', 'Week', 'Month'];
   isPanelOpen = false;
   panelMode: 'create' | 'edit' = 'create';
   selectedOrder: WorkOrder | null = null;
@@ -26,36 +29,69 @@ export class App implements OnInit{
 
   isMobile = window.innerWidth <= 992; 
   selectedMobileWorkCenterId: string | null = null;
-
-  @HostListener('window:resize')
-  onResize() {
-    this.isMobile = window.innerWidth <= 992;
-  }
+  
+  isExtending = false;
 
   ngOnInit() {
     const centers = this.timelineService.workCenters();
-    if (centers.length > 0) {
-      this.selectedMobileWorkCenterId = centers[0].docId;
-    }
+    if (centers.length > 0) this.selectedMobileWorkCenterId = centers[0].docId;
   }
 
-  get visibleWorkCenters() {
-    const centers = this.timelineService.workCenters();
-    
-    if (this.isMobile) {
-      return centers.filter(wc => wc.docId === this.selectedMobileWorkCenterId);
-    }
-    
-    return centers; 
-  }
+  timelineReady = false;
 
   ngAfterViewInit() {
-    setTimeout(() => this.scrollToToday(), 50); 
+    this.scrollToToday();
+    
+    requestAnimationFrame(() => {
+      this.timelineReady = true;
+      this.cdr.detectChanges();
+    }); 
   }
 
-  scrollToToday() {
-    const scrollContainer = document.querySelector('.timeline-card') as HTMLElement;
+  onTimelineScroll(event: Event) {
+    const element = event.target as HTMLElement;
+
+    if (this.isExtending) return;
+
+    const threshold = 150; 
+    const scrollLeft = element.scrollLeft;
+    const scrollWidth = element.scrollWidth;
+    const clientWidth = element.clientWidth;
+    const distanceToRight = scrollWidth - scrollLeft - clientWidth;
+
+    if (distanceToRight < threshold) {
+      console.log('EXTENDING FUTURE');
+      this.isExtending = true;
+      this.timelineService.extendTimeline('future', 6);
+      this.cdr.detectChanges();
+      
+      setTimeout(() => { this.isExtending = false; }, 200);
+    } 
     
+    else if (scrollLeft < threshold) {
+      console.log('EXTENDING PAST');
+      this.isExtending = true;
+
+      const preWidth = element.scrollWidth;
+      const preLeft = element.scrollLeft;
+
+      this.timelineService.extendTimeline('past', 6);
+      
+      this.cdr.detectChanges(); 
+
+      const postWidth = element.scrollWidth;
+      const diff = postWidth - preWidth;
+      
+      element.scrollLeft = preLeft + diff;
+
+      setTimeout(() => { this.isExtending = false; }, 200);
+    }
+  }
+
+  @HostListener('window:resize') onResize() { this.isMobile = window.innerWidth <= 992; }
+  
+  scrollToToday() {
+    const scrollContainer = this.scrollArea?.nativeElement;
     if (scrollContainer) {
       scrollContainer.scrollLeft = Math.max(0, this.todayLeftPosition - 300);
     }
@@ -66,86 +102,45 @@ export class App implements OnInit{
     setTimeout(() => this.scrollToToday(), 50);
   }
 
-  getOrdersFor(wcId: string) { 
-    return this.timelineService.workOrders().filter(o => o.data.workCenterId === wcId); 
+  get visibleWorkCenters() {
+    const centers = this.timelineService.workCenters();
+    return this.isMobile ? centers.filter(wc => wc.docId === this.selectedMobileWorkCenterId) : centers;
   }
 
-  openCreateWithDate(dateStr: string, wcId: string) {
-    this.panelMode = 'create';
-    this.clickedCenterId = wcId;
-    this.selectedOrder = null;
-    this.clickedDateStr = dateStr; 
-    this.isPanelOpen = true;
-  }
-
-  openEdit(order: WorkOrder) {
-    this.panelMode = 'edit';
-    this.selectedOrder = order;
-    this.isPanelOpen = true;
-  }
-
-  deleteOrder(docId: string) { 
-    this.timelineService.deleteWorkOrder(docId); 
-  }
+  getOrdersFor(wcId: string) { return this.timelineService.workOrders().filter(o => o.data.workCenterId === wcId); }
+  openCreateWithDate(dateStr: string, wcId: string) { this.panelMode = 'create'; this.clickedCenterId = wcId; this.selectedOrder = null; this.clickedDateStr = dateStr; this.isPanelOpen = true; }
+  openEdit(order: WorkOrder) { this.panelMode = 'edit'; this.selectedOrder = order; this.isPanelOpen = true; }
+  deleteOrder(docId: string) { this.timelineService.deleteWorkOrder(docId); }
 
   get currentBadgeText(): string {
     const scale = this.timelineService.timeScale();
-    if (scale === 'Month') return 'Current month';
-    if (scale === 'Week') return 'Current week';
-    return 'Today';
+    return scale === 'Month' ? 'Current month' : scale === 'Week' ? 'Current week' : 'Today';
   }
 
   get todayLeftPosition(): number {
     const today = new Date();
     const scale = this.timelineService.timeScale();
-
+    const startDate = this.timelineService.timelineStartDate();
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-    let columnLeftPixel = 0;
-    let columnWidthPixels = 0;
 
     if (scale === 'Month') {
       const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      const daysFromStart = this.timelineService.getDaysBetween(this.timelineService.timelineStartDate, startOfMonth);
-      
-      columnLeftPixel = daysFromStart * this.timelineService.pixelsPerDay();
-      
+      const daysFromStart = this.timelineService.getDaysBetween(startDate, startOfMonth);
       const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-      columnWidthPixels = daysInMonth * this.timelineService.pixelsPerDay();
-
+      return (daysFromStart * this.timelineService.pixelsPerDay()) + ((daysInMonth * this.timelineService.pixelsPerDay()) / 2);
     } else if (scale === 'Week') {
-      const daysToToday = this.timelineService.getDaysBetween(this.timelineService.timelineStartDate, todayMidnight);
-      
-      const weeksPassed = Math.floor(daysToToday / 7);
-      
-      columnLeftPixel = weeksPassed * 7 * this.timelineService.pixelsPerDay();
-      columnWidthPixels = 7 * this.timelineService.pixelsPerDay();
-
+      const days = this.timelineService.getDaysBetween(startDate, todayMidnight);
+      return (Math.floor(days / 7) * 7 * this.timelineService.pixelsPerDay()) + (3.5 * this.timelineService.pixelsPerDay());
     } else {
-      const daysFromStart = this.timelineService.getDaysBetween(this.timelineService.timelineStartDate, todayMidnight);
-      
-      columnLeftPixel = daysFromStart * this.timelineService.pixelsPerDay();
-      columnWidthPixels = 1 * this.timelineService.pixelsPerDay(); 
+      const days = this.timelineService.getDaysBetween(startDate, todayMidnight);
+      return (days * this.timelineService.pixelsPerDay()) + (this.timelineService.pixelsPerDay() / 2);
     }
-
-    return columnLeftPixel + (columnWidthPixels / 2);
   }
 
   get todayWidthPixels(): number {
     const today = new Date();
     const scale = this.timelineService.timeScale();
-
-    if (scale === 'Month') {
-      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-      return daysInMonth * this.timelineService.pixelsPerDay();
-      
-    } else if (scale === 'Week') {
-      return 7 * this.timelineService.pixelsPerDay();
-      
-    } else {
-      return 1 * this.timelineService.pixelsPerDay();
-    }
+    if (scale === 'Month') return new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate() * this.timelineService.pixelsPerDay();
+    return (scale === 'Week' ? 7 : 1) * this.timelineService.pixelsPerDay();
   }
-
-  
 }

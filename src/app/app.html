@@ -7,15 +7,9 @@
       @if (isMobile) {
       <div class="mobile-wc-control">
         <span class="label">Work Center</span>
-        <ng-select 
-          [items]="timelineService.workCenters()" 
-          bindLabel="data.name" 
-          bindValue="docId"
-          [(ngModel)]="selectedMobileWorkCenterId"
-          [clearable]="false" 
-          [searchable]="false"
-          appendTo=".timescale-wrapper"
-          class="timescale-dropdown">
+        <ng-select [items]="timelineService.workCenters()" bindLabel="data.name" bindValue="docId"
+          [(ngModel)]="selectedMobileWorkCenterId" [clearable]="false" [searchable]="false"
+          appendTo=".timescale-wrapper" class="timescale-dropdown">
         </ng-select>
       </div>
       }
@@ -41,11 +35,11 @@
     </div>
     }
 
-    <div class="timeline-scroll-area" #scrollArea>
+    <div class="timeline-scroll-area" #scrollArea [class.is-ready]="timelineReady" (scroll)="onTimelineScroll($event)"
+      style="overflow-x: auto; display: block;">
       <div class="date-headers-row">
         @for (col of timelineService.timelineColumns(); track col.dateStr) {
-        <div class="date-header-cell"
-          [style.min-width.px]="timelineService.pixelsPerDay() * col.daysInCol">
+        <div class="date-header-cell" [style.min-width.px]="timelineService.pixelsPerDay() * col.daysInCol">
           {{ col.label }}
         </div>
         }
