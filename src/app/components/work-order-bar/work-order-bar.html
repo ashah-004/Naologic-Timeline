@@ -1,0 +1,33 @@
+<div class="bar-container" [style.left.px]="computedLeft" [style.width.px]="computedWidth">
+  <div class="order-bar" [ngClass]="order.data.status" (click)="$event.stopPropagation(); edit.emit()">
+    
+    <span class="title">{{ order.data.name }}</span>
+    <span class="status-pill" [ngClass]="order.data.status">{{ order.data.status | titlecase }}</span>
+    
+    <div (click)="$event.stopPropagation()" >
+      
+      <ng-select 
+        class="three-dots-select"
+        [items]="actionItems" 
+        bindLabel="label" 
+        bindValue="id" 
+        [(ngModel)]="selectedAction"
+        (change)="onActionSelect($event)"
+        (open)="onToggle(true)"
+        (close)="onToggle(false)"
+        [searchable]="false" 
+        [clearable]="false" 
+        appendTo="body"
+        placeholder="•••">
+        
+        <ng-template ng-option-tmp let-item="item">
+          <div class="custom-dropdown-item" [ngClass]="item.className">
+            {{ item.label }}
+          </div>
+        </ng-template>
+
+      </ng-select>
+
+    </div>
+  </div>
+</div>

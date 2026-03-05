@@ -1,0 +1,83 @@
+<div class="panel-backdrop" [class.closing]="isClosing" (click)="closeWithAnimation()"></div>
+
+<div class="side-panel" [class.closing]="isClosing" (click)="d1.close(); d2.close()">
+  
+  <div class="panel-header">
+    <div class="header-titles">
+      <h2>{{ mode === 'create' ? 'Create New Event' : 'Work Order Details' }}</h2>
+      <p class="subtitle">Specify the dates, name and status for this order</p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-cancel" type="button" (click)="closeWithAnimation()">Cancel</button>
+      <button class="btn btn-primary" type="button" (click)="onSubmit()" [disabled]="form.invalid">
+        {{ mode === 'create' ? 'Create' : 'Save' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="separator" ></div>
+
+  <form [formGroup]="form" class="panel-content">
+    
+    @if (overlapError) {
+      <div class="alert alert-danger" style="font-size: 13px; margin-bottom: 20px;">
+        Error: Order dates overlap with an existing order on this Work Center.
+      </div>
+    }
+
+    <div class="form-group">
+      <label>Work Order Name</label>
+      <input type="text" formControlName="name" class="form-control" placeholder="e.g. Acme Inc.">
+    </div>
+
+    <div class="form-group" style="display: none;">
+      <input type="text" formControlName="workCenterId">
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <ng-select [items]="statuses" bindLabel="label" bindValue="id" formControlName="status" [clearable]="false" [searchable]="false" class="custom-select">
+        
+        <ng-template ng-label-tmp let-item="item">
+          <span class="status-pill" [ngClass]="item.id">{{ item.label }}</span>
+        </ng-template>
+        
+        <ng-template ng-option-tmp let-item="item">
+          {{ item.label }}
+        </ng-template>
+      </ng-select>
+    </div>
+
+    <div class="form-group">
+      <label>Start date</label>
+      <input class="form-control custom-input" 
+             placeholder="Select date"
+             formControlName="startDate" 
+             ngbDatepicker #d1="ngbDatepicker" 
+             [startDate]="form.get('startDate')?.value || today" 
+             [navigation]="'select'" 
+             [autoClose]="'outside'"
+             container="body" 
+             [minDate]="minStartDate" 
+             (click)="d1.toggle(); $event.stopPropagation()" 
+             readonly>
+    </div>
+
+    <div class="form-group">
+      <label>End date</label>
+      <input class="form-control custom-input" 
+             placeholder="Select date"
+             formControlName="endDate" 
+             ngbDatepicker #d2="ngbDatepicker" 
+             [startDate]="form.get('endDate')?.value || form.get('startDate')?.value || today" 
+             [navigation]="'select'" 
+             [autoClose]="'outside'"
+             container="body" 
+             [minDate]="minEndDate" 
+             (click)="d2.toggle(); $event.stopPropagation()" 
+             readonly>
+    </div>
+
+  </form>
+</div>

@@ -1,0 +1,123 @@
+.panel-backdrop { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100vw; 
+  height: 100vh; 
+  background: rgba(0,0,0,0.4); 
+  z-index: 1000; 
+}
+
+.side-panel {
+  position: fixed; 
+  top: 0; 
+  right: 0; 
+  min-width: 480px; 
+  height: 100vh; 
+  background: white; 
+  z-index: 1001;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1); 
+  display: flex; 
+  flex-direction: column; 
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 24px;
+  gap: 50px;
+  
+  .header-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  h2 { font-size: 20px; font-weight: 500; margin: 0; color: #111827; }
+  .subtitle { color: rgba(104, 113, 150, 1); font-size: 16px; margin: 0;font-weight: 400; }
+  
+  .header-actions { 
+    display: flex; 
+    gap: 12px; 
+  }
+}
+
+.separator{
+    width: 100%;
+    height: 1px;
+    background-color: rgba(230, 235, 240, 1);
+}
+
+.btn-primary { min-width: 66px; background-color: rgba(86, 89, 255, 1); color: white; border: none; font-size: 14px; border-radius: 8px; font-weight: 400; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 1) , 0 1px 3px 0 rgba(200, 207, 233, 1);}
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cancel { min-width: 66px;background-color: white;  color: rgba(47, 48, 89, 1); font-size: 14px; border-radius: 8px;  font-weight: 500; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 1) , 0 1px 3px 0 rgba(200, 207, 233, 1);}
+
+.panel-content { 
+  padding: 24px; 
+  flex: 1; 
+  overflow-y: auto; 
+}
+
+.form-group { 
+  margin-bottom: 24px; 
+  label { font-size: 14px; font-weight: 500;  color: rgba(104, 113, 150, 1); margin-bottom: 8px; display: block; } 
+}
+
+.status-pill {
+  font-size: 12px; padding: 4px 10px; border-radius: 5px; display: inline-block; font-weight: 500;
+  &.open { background: rgba(228, 253, 255, 1); color: rgba(0, 176, 191, 1);}
+  &.in-progress { background: rgba(214, 216, 255, 1); color: rgba(62, 64, 219, 1); }
+  &.complete { background: rgba(225, 255, 204, 1); color: rgba(8, 162, 104, 1); }
+  &.blocked { background: rgba(252, 238, 181, 1); color: rgba(177, 54, 0, 1); }
+}
+
+.form-control:focus, 
+.custom-input:focus,
+.custom-input:active {
+  outline: none !important;
+  box-shadow: none !important; 
+  border-color: #E5E7EB !important; 
+  background-color: #ffffff !important; 
+}
+
+::ng-deep .ng-select.custom-select.ng-select-focused .ng-select-container {
+  box-shadow: none !important;
+  border-color: #E5E7EB !important;
+}
+
+::ng-deep .ng-select.custom-select.ng-select-opened .ng-select-container {
+  border-bottom-left-radius: 5px !important;  
+  border-bottom-right-radius: 5px !important;
+}
+
+button.btn-cancel:focus, button.btn-cancel:active, button.btn-cancel:focus-visible,
+button.btn-primary:focus, button.btn-primary:active, button.btn-primary:focus-visible {
+  outline: 0 !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 1) , 0 1px 3px 0 rgba(200, 207, 233, 1) !important;
+  -webkit-tap-highlight-color: transparent !important; 
+}
+
+@keyframes slideIn { 
+  from { transform: translateX(100%); } 
+  to { transform: translateX(0); } 
+}
+
+@keyframes slideOut { 
+  from { transform: translateX(0); } 
+  to { transform: translateX(100%); } 
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.side-panel.closing {
+  animation: slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.panel-backdrop.closing {
+  animation: fadeOut 0.3s ease-in-out forwards !important;
+}

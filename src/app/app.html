@@ -1,0 +1,74 @@
+<div class="app-layout">
+  <div class="header-container">
+    <div class="logo">NAOLOGIC</div>
+    <h1>Work Orders</h1>
+    <div class="timescale-wrapper">
+
+      <div class="timescale-control">
+        <span class="label">Timescale</span>
+
+        <ng-select [items]="scales" [ngModel]="timelineService.timeScale()" (ngModelChange)="onScaleChange($event)"
+          [clearable]="false" [searchable]="false" appendTo=".timescale-wrapper" class="timescale-dropdown">
+        </ng-select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="timeline-card">
+    <div class="sidebar">
+      <div class="grid-header-cell">Work Center</div>
+      @for (wc of timelineService.workCenters(); track wc.docId) {
+      <div class="grid-row-cell">{{ wc.data.name }}</div>
+      }
+    </div>
+
+    <div class="timeline-scroll-area" #scrollArea>
+      <div class="date-headers-row">
+        @for (col of timelineService.timelineColumns(); track col.dateStr) {
+        <div class="date-header-cell"
+          [style.min-width.px]="timelineService.pixelsPerDay() * col.daysInCol">
+          {{ col.label }}
+        </div>
+        }
+
+        <div class="current-time-indicator" [style.left.px]="todayLeftPosition">
+          <div class="badge" [style.width.px]="todayWidthPixels">{{ currentBadgeText }}</div>
+        </div>
+      </div>
+
+      <div class="grid-body">
+
+        @for (wc of timelineService.workCenters(); track wc.docId; let isFirst = $first) {
+        <div class="timeline-row" [class.is-first-row]="isFirst">
+
+          <div class="cells-container">
+            @for (col of timelineService.timelineColumns(); track col.dateStr) {
+            <div class="timeline-cell" [style.min-width.px]="timelineService.pixelsPerDay() * col.daysInCol"
+              (click)="openCreateWithDate(col.dateStr, wc.docId)">
+
+              <div class="hover-add-prompt">
+                <span class="prompt-btn">Click to add dates</span>
+                <div class="prompt-ghost-box"></div>
+              </div>
+
+            </div>
+            }
+          </div>
+
+          @for (order of getOrdersFor(wc.docId); track order.docId) {
+          <app-work-order-bar [order]="order" (edit)="openEdit(order)" (delete)="deleteOrder(order.docId)">
+          </app-work-order-bar>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (isPanelOpen) {
+<app-work-order-panel [mode]="panelMode" [selectedOrder]="selectedOrder" [prefilledWorkCenterId]="clickedCenterId"
+  [defaultStartDate]="clickedDateStr" (closePanel)="isPanelOpen = false">
+</app-work-order-panel>
+}
