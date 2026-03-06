@@ -1,4 +1,4 @@
-# 🗓️ Angular  Timeline & Work Order Management
+# 🗓️ Naologic Timeline
 
 A Timeline and Work Order management UI built entirely in Angular, featuring dynamic timescale Zoom Levels.
 
