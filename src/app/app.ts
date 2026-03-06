@@ -13,7 +13,6 @@ import { WorkOrderPanelComponent } from './components/work-order-panel/work-orde
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-
 export class App implements OnInit, AfterViewInit {
   timelineService = inject(TimelineService);
   cdr = inject(ChangeDetectorRef);
@@ -31,17 +30,15 @@ export class App implements OnInit, AfterViewInit {
   selectedMobileWorkCenterId: string | null = null;
   
   isExtending = false;
+  timelineReady = false;
 
   ngOnInit() {
     const centers = this.timelineService.workCenters();
     if (centers.length > 0) this.selectedMobileWorkCenterId = centers[0].docId;
   }
 
-  timelineReady = false;
-
   ngAfterViewInit() {
     this.scrollToToday();
-    
     requestAnimationFrame(() => {
       this.timelineReady = true;
       this.cdr.detectChanges();
@@ -60,30 +57,22 @@ export class App implements OnInit, AfterViewInit {
     const distanceToRight = scrollWidth - scrollLeft - clientWidth;
 
     if (distanceToRight < threshold) {
-      console.log('EXTENDING FUTURE');
       this.isExtending = true;
       this.timelineService.extendTimeline('future', 6);
       this.cdr.detectChanges();
-      
       setTimeout(() => { this.isExtending = false; }, 200);
-    } 
-    
-    else if (scrollLeft < threshold) {
-      console.log('EXTENDING PAST');
+    } else if (scrollLeft < threshold) {
       this.isExtending = true;
-
       const preWidth = element.scrollWidth;
       const preLeft = element.scrollLeft;
 
       this.timelineService.extendTimeline('past', 6);
-      
       this.cdr.detectChanges(); 
 
       const postWidth = element.scrollWidth;
       const diff = postWidth - preWidth;
       
       element.scrollLeft = preLeft + diff;
-
       setTimeout(() => { this.isExtending = false; }, 200);
     }
   }
@@ -93,7 +82,11 @@ export class App implements OnInit, AfterViewInit {
   scrollToToday() {
     const scrollContainer = this.scrollArea?.nativeElement;
     if (scrollContainer) {
-      scrollContainer.scrollLeft = Math.max(0, this.todayLeftPosition - 300);
+      const sidebarWidth = this.isMobile ? 0 : 280;
+      const absolutePosition = sidebarWidth + this.todayLeftPosition;
+      const screenOffset = scrollContainer.clientWidth / 2;
+      
+      scrollContainer.scrollLeft = Math.max(0, absolutePosition - screenOffset);
     }
   }
 
