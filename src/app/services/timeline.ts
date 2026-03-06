@@ -47,9 +47,14 @@ export class TimelineService {
 
   workOrders = signal<WorkOrder[]>([
     { docId: 'wo_1', docType: 'workOrder', data: { name: 'Complete Systems', workCenterId: 'wc_1', status: 'complete', startDate: '2024-09-15', endDate: '2024-10-10' } },
-    { docId: 'wo_2', docType: 'workOrder', data: { name: 'Rodriguez Electrics', workCenterId: 'wc_2', status: 'in-progress', startDate: '2024-08-10', endDate: '2024-09-05' } },
-    { docId: 'wo_3', docType: 'workOrder', data: { name: 'Konsulting Inc', workCenterId: 'wc_3', status: 'in-progress', startDate: '2024-08-20', endDate: '2024-09-25' } },
-    { docId: 'wo_4', docType: 'workOrder', data: { name: 'McMarrow Distribution', workCenterId: 'wc_4', status: 'blocked', startDate: '2024-09-10', endDate: '2024-11-05' } },
+    { docId: 'wo_2', docType: 'workOrder', data: { name: 'Complete Systems', workCenterId: 'wc_1', status: 'open', startDate: '2025-09-15', endDate: '2025-10-10' } },
+    { docId: 'wo_3', docType: 'workOrder', data: { name: 'Complete Systems', workCenterId: 'wc_1', status: 'blocked', startDate: '2026-09-15', endDate: '2026-10-10' } },
+    { docId: 'wo_4', docType: 'workOrder', data: { name: 'Complete Systems', workCenterId: 'wc_1', status: 'in-progress', startDate: '2026-03-15', endDate: '2026-4-10' } },
+    { docId: 'wo_5', docType: 'workOrder', data: { name: 'Rodriguez Electrics', workCenterId: 'wc_2', status: 'in-progress', startDate: '2024-08-10', endDate: '2024-09-05' } },
+    { docId: 'wo_6', docType: 'workOrder', data: { name: 'Konsulting Inc', workCenterId: 'wc_3', status: 'in-progress', startDate: '2024-08-20', endDate: '2024-09-25' } },
+    { docId: 'wo_7', docType: 'workOrder', data: { name: 'McMarrow Distribution', workCenterId: 'wc_4', status: 'blocked', startDate: '2024-09-10', endDate: '2024-11-05' } },
+    { docId: 'wo_8', docType: 'workOrder', data: { name: 'Amazon', workCenterId: 'wc_8', status: 'blocked', startDate: '2024-09-10', endDate: '2024-11-05' } },
+    { docId: 'wo_9', docType: 'workOrder', data: { name: 'Amazon', workCenterId: 'wc_8', status: 'complete', startDate: '2025-09-10', endDate: '2025-11-05' } },
   ]);
 
   constructor() {

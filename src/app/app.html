@@ -36,7 +36,7 @@
     }
 
     <div class="timeline-scroll-area" #scrollArea [class.is-ready]="timelineReady" (scroll)="onTimelineScroll($event)"
-      style="overflow-x: auto; display: block;">
+      style="overflow-x: auto; display: block; height: fit-content;">
       <div class="date-headers-row">
         @for (col of timelineService.timelineColumns(); track col.dateStr) {
         <div class="date-header-cell" [style.min-width.px]="timelineService.pixelsPerDay() * col.daysInCol">
